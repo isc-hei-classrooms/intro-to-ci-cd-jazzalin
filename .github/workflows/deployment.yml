@@ -1,0 +1,39 @@
+name: Dummy deployment
+
+on:
+  release:
+    types: [created]
+  push:
+    tags:
+     - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: actions/checkout@v4
+      - run: make
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        uses: actions/checkout@v4
+      - run: make test
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: actions/checkout@v4
+      - run: tar -cvzf dummy-release.tar.gz -C .
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          path: ./dummy-release.tar.gz
+          name: dummy-release.tar.gz
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release
+          artifacts: ./dummy-release.tar.gz
