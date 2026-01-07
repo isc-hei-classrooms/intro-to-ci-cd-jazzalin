@@ -17,7 +17,7 @@ jobs:
       - name: Test
         run: make test
       - name: Deploy
-        run: tar -cvzf dummy-release.tar.gz -C ./build
+        run: tar -cvzf dummy-release.tar.gz -C ./build main
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
