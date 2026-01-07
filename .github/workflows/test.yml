@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Build
         uses: actions/checkout@v3
-        run: make
+      - run: make
       - name: Test
         uses: actions/checkout@v3
-        run: make test
+      - run: make test
