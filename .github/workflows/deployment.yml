@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Deploy
         uses: actions/checkout@v4
-      - run: tar -cvzf dummy-release.tar.gz -C .
+      - run: tar -cvzf dummy-release.tar.gz -C ./build
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
