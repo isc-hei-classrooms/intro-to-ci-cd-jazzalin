@@ -8,24 +8,16 @@ on:
      - '*'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build
-        uses: actions/checkout@v4
-      - run: make
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test
-        uses: actions/checkout@v4
-      - run: make test
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: make release
+      - name: Test
+        run: make test
       - name: Deploy
-        uses: actions/checkout@v4
-      - run: tar -cvzf dummy-release.tar.gz -C ./build
+        run: tar -cvzf dummy-release.tar.gz -C ./build
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
