@@ -18,16 +18,23 @@ jobs:
         run: make release
       - name: Test
         run: make test
-      - name: Deploy
-        run: tar -cvzf dummy-release.tar.gz -C ./build main
+      - name: Package
+        if: github.event_name == 'release'
+        run: |
+            mkdir -p dist
+            cp ./build/main dist/dummydb
+            cp LICENSE dist/
+            tar -cvzf dummy-release.tar.gz dist
       - name: Upload
         uses: actions/upload-artifact@v4
+        if: github.event_name == 'release'
         with:
           if-no-files-found: error
           path: ./dummy-release.tar.gz
           name: dummy-release.tar.gz
       - name: Release
         uses: ncipollo/release-action@v1
+        if: github.event_name == 'release'
         with:
           name: Release
           artifacts: ./dummy-release.tar.gz
