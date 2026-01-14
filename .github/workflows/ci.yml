@@ -1,0 +1,42 @@
+name: CI (Base)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [published]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build 
+      run: make
+
+    - name: Test
+      run: make test
+
+    - name: Package
+      if: github.event_name == 'release'
+      run: |
+          mkdir -p dist
+          cp ./build/main dist/dummydb-linux-amd64
+          chmod +x dist/dummydb-linux-amd64
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: github.event_name == 'release'
+      with:
+        files: |
+          dist/dummydb-linux-amd64
+          LICENSE
+
+    
+
+

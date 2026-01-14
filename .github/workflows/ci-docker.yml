@@ -1,0 +1,49 @@
+name: CI (Docker)
+permissions:
+  contents: read
+  packages: write
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [ published ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t dummydb:ci .
+
+      - name: Run container (smoke test)
+        run: docker run --rm dummydb:ci
+
+  publish:
+    if: github.event_name == 'release'
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Github Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+          docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Set image name
+        run: |
+            echo "IMAGE=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')/dummydb" >> $GITHUB_ENV
+
+      - name: Build and push image
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          docker build -t "$IMAGE:$TAG" -t "$IMAGE:latest" .
+          docker push "$IMAGE:$TAG"
+          docker push "$IMAGE:latest"
